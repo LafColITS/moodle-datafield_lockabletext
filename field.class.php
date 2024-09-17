@@ -15,22 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    datafield
- * @subpackage lockabletext
+ * Class lockabletext field for database activity
+ *
+ * @package    datafield_lockabletext
  * @copyright  2024 onwards Lafayette College ITS
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 use core\notification;
 
-require_once __DIR__ . '/../text/field.class.php';
+require_once(__DIR__ . '/../text/field.class.php');
 
+/**
+ * Class lockabletext field for database activity
+ *
+ * @package    datafield_lockabletext
+ * @copyright  2024 onwards Lafayette College ITS
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class data_field_lockabletext extends data_field_text {
+    /** @var string The internal datafield type */
     public $type = 'lockabletext';
 
-    protected static $priority = self::MAX_PRIORITY;
-
-    function display_add_field($recordid=0, $formdata=null) {
+    /**
+     * Output control for editing content.
+     *
+     * @param int $recordid the id of the data record.
+     * @param object $formdata the submitted form.
+     *
+     * @return string
+     */
+    public function display_add_field($recordid=0, $formdata=null) {
         global $DB, $OUTPUT;
 
         $readonly = '';
@@ -44,7 +61,7 @@ class data_field_lockabletext extends data_field_text {
             $fieldname = 'field_' . $this->field->id;
             $content = $formdata->$fieldname;
         } else if ($recordid) {
-            $content = $DB->get_field('data_content', 'content', array('fieldid'=>$this->field->id, 'recordid'=>$recordid));
+            $content = $DB->get_field('data_content', 'content', ['fieldid'=>$this->field->id, 'recordid'=>$recordid]);
         } else {
             $content = '';
         }
@@ -77,9 +94,11 @@ class data_field_lockabletext extends data_field_text {
      * Capability checks occur here because the field_validation
      * method does not have access to the old record.
      *
-     * @param
+     * @param int $recordid the record id
+     * @param string $value the the draft area id
+     * @param string $name constructed name of the field, such as "field_10_lockabletext"
      */
-    function update_content($recordid, $value, $name='') {
+    public function update_content($recordid, $value, $name='') {
         global $DB;
 
         // Populate the new record.
@@ -90,7 +109,7 @@ class data_field_lockabletext extends data_field_text {
 
         $context = \context_module::instance($this->cm->id);
 
-        if ($oldcontent = $DB->get_record('data_content', array('fieldid'=>$this->field->id, 'recordid'=>$recordid))) {
+        if ($oldcontent = $DB->get_record('data_content', ['fieldid' => $this->field->id, 'recordid' => $recordid])) {
             if(($content->content !== $oldcontent->content) && $this->field->param1 === 'on' && ! has_capability('datafield/lockabletext:manage', $context)) {
                 notification::error(get_string('readonly', 'datafield_lockabletext', $this->field->name));
                 return false;
