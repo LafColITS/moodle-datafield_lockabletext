@@ -61,14 +61,14 @@ class data_field_lockabletext extends data_field_text {
             $fieldname = 'field_' . $this->field->id;
             $content = $formdata->$fieldname;
         } else if ($recordid) {
-            $content = $DB->get_field('data_content', 'content', ['fieldid'=>$this->field->id, 'recordid'=>$recordid]);
+            $content = $DB->get_field('data_content', 'content', ['fieldid' => $this->field->id, 'recordid' => $recordid]);
         } else {
             $content = '';
         }
 
-        // beware get_field returns false for new, empty records MDL-18567
-        if ($content===false) {
-            $content='';
+        // Beware get_field returns false for new, empty records MDL-18567.
+        if ($content === false) {
+            $content = '';
         }
 
         $str = '<div title="' . s($this->field->description) . '">';
@@ -110,14 +110,16 @@ class data_field_lockabletext extends data_field_text {
         $context = \context_module::instance($this->cm->id);
 
         if ($oldcontent = $DB->get_record('data_content', ['fieldid' => $this->field->id, 'recordid' => $recordid])) {
-            if(($content->content !== $oldcontent->content) && $this->field->param1 === 'on' && ! has_capability('datafield/lockabletext:manage', $context)) {
+            if (($content->content !== $oldcontent->content) && $this->field->param1 === 'on'
+                    && ! has_capability('datafield/lockabletext:manage', $context)) {
                 notification::error(get_string('readonly', 'datafield_lockabletext', $this->field->name));
                 return false;
             }
             $content->id = $oldcontent->id;
             return $DB->update_record('data_content', $content);
         } else {
-            if(!empty($content->content) && $this->field->param1 === 'on' && ! has_capability('datafield/lockabletext:manage', $context)) {
+            if (!empty($content->content) && $this->field->param1 === 'on'
+                    && ! has_capability('datafield/lockabletext:manage', $context)) {
                 notification::error(get_string('readonly', 'datafield_lockabletext', $this->field->name));
                 return false;
             }
