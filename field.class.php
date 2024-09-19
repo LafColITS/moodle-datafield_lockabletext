@@ -101,29 +101,11 @@ class data_field_lockabletext extends data_field_text {
     public function update_content($recordid, $value, $name='') {
         global $DB;
 
-        // Populate the new record.
-        $content = new stdClass();
-        $content->fieldid = $this->field->id;
-        $content->recordid = $recordid;
-        $content->content = clean_param($value, PARAM_NOTAGS);
-
         $context = \context_module::instance($this->cm->id);
-
-        if ($oldcontent = $DB->get_record('data_content', ['fieldid' => $this->field->id, 'recordid' => $recordid])) {
-            if (($content->content !== $oldcontent->content) && $this->field->param1 === 'on'
-                    && ! has_capability('datafield/lockabletext:manage', $context)) {
-                notification::error(get_string('readonly', 'datafield_lockabletext', $this->field->name));
-                return false;
-            }
-            $content->id = $oldcontent->id;
-            return $DB->update_record('data_content', $content);
-        } else {
-            if (!empty($content->content) && $this->field->param1 === 'on'
-                    && ! has_capability('datafield/lockabletext:manage', $context)) {
-                notification::error(get_string('readonly', 'datafield_lockabletext', $this->field->name));
-                return false;
-            }
-            return $DB->insert_record('data_content', $content);
+        if (!has_capability('datafield/lockabletext:manage', $context)) {
+            return true;
         }
+
+        return parent::update_content($recordid, $value, $name);
     }
 }

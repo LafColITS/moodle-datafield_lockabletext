@@ -27,5 +27,3 @@ $string['pluginname'] = 'Lockable text';
 $string['fieldtypelabel'] = 'Lockable text';
 $string['locked'] = 'Locked';
 $string['privacy:metadata'] = 'The Lockable text field component doesn\'t store any personal data; it uses tables defined in mod_data.';
-$string['sample'] = 'This is a short text';
-$string['readonly'] = 'You do not have permission to update the {$a} field';
